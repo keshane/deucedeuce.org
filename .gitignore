@@ -1,0 +1,8 @@
+settings.py
+*__pycache__*
+wsgi.py
+.idea/*
+*.pyc
+Deuces_db
+*.swp
+

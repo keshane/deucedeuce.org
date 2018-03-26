@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deuces</title>
+</head>
+<body>
+<h1><a href="{% url "index" %}">Home</a></h1>
+<h2>{{ establishment.name }}</h2>
+    <p>{{ establishment.description }}</p>
+    {% for review in reviews %}
+        <hr>
+        <h3>{{ review.deucer }}</h3>
+        <p>{{ review.rating }}</p>
+        <p>{{ review.review }}</p>
+    {% endfor %}
+
+</body>
+</html>

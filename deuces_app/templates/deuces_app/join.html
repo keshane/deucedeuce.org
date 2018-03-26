@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deuces</title>
+</head>
+<body>
+
+<form method="POST">
+    {% csrf_token %}
+    <table>
+{{ form }}
+        </table>
+    <input type="submit" value="Join"/>
+</form>
+
+</body>
