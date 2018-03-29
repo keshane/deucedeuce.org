@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deuces</title>
+</head>
+<body>
+{% if user.is_authenticated %}
+Hello, {{ user.username }}
+{% endif %}
+{% block content %}
+
+{% endblock %}
+
+</body>

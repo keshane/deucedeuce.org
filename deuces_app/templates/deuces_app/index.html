@@ -1,15 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Deuces</title>
-</head>
-<body>
+{% extends "deuces_app/base.html" %}
+
+{% block content %}
+
 <h1>Deuces</h1>
+<br>
+
 {% for establishment in establishments %}
     <a href="{% url "establishment" establishment.name %}">{{ establishment.name }}</a>
     <br>
 {% endfor %}
 
-</body>
-</html>
+{% if form %}
+<form method="POST">
+    {% csrf_token %}
+    <table>
+        {{ form }}
+    </table>
+    <input type="submit" value="Add Establishment"/>
+</form>
+
+{% endif %}
+
+{% endblock %}

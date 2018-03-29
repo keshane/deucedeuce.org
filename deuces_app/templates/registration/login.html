@@ -1,13 +1,15 @@
 {% extends "deuces_app/base.html" %}
 
 {% block content %}
+<h1>Deuces</h1>
 
 <form method="POST">
     {% csrf_token %}
     <table>
-{{ form }}
-        </table>
-    <input type="submit" value="Join"/>
+    {{ form }}
+    </table>
+    <input type="submit" value="Sign in"/>
+
 </form>
 
 {% endblock %}
