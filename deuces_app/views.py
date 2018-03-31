@@ -47,6 +47,18 @@ def establishment(request, establishment_name):
     return render(request, "deuces_app/establishment.html", data)
 
 
+def restroom(request, establishment_name, restroom_name):
+    restroom = deuces_app.models.Restroom.objects.get(establishment__name=establishment_name, name=restroom_name)
+    reviews = deuces_app.models.Review.objects.filter(restroom=restroom)
+    data = {
+            "restroom": restroom,
+            "reviews": reviews,
+           }
+
+    return render(request, "deuces_app/restroom.html", data)
+
+
+
 def add_restroom(request, establishment_name):
     if request.method == "POST" and request.user.is_authenticated:
         form = RestroomForm(request.POST)

@@ -6,8 +6,9 @@
 </head>
 <body>
 {% if user.is_authenticated %}
-Hello, {{ user.username }}
+<p>Hello, {{ user.username }}</p>
 {% endif %}
+<h1><a href="{% url "index" %}">Deuces</a></h1>
 {% block content %}
 
 {% endblock %}

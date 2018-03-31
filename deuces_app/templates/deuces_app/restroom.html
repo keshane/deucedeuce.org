@@ -1,0 +1,18 @@
+{% extends "deuces_app/base.html" %}
+
+{% block content %}
+<h2>
+    <a href="{% url "establishment" restroom.establishment.name %}">
+    Establishment: {{ restroom.establishment.name }}
+</a>
+</h2>
+<h2>Restroom: {{ restroom.name }}</h2>
+{% for review in reviews %}
+    <hr>
+    <h3>{{ review.deucer }}</h3>
+    <p><b>{{ review.rating }}</b></p>
+    <p>{{ review.review }}</p>
+{% endfor %}
+
+
+{% endblock %}

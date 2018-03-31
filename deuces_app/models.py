@@ -75,6 +75,7 @@ class Restroom(models.Model):
     class Meta:
         managed = True
         db_table = 'Restroom'
+        unique_together = ("establishment", "name")
 
 
 class Review(models.Model):

@@ -2,9 +2,6 @@
 
 {% block content %}
 
-<h1>Deuces</h1>
-<br>
-
 {% for establishment in establishments %}
     <a href="{% url "establishment" establishment.name %}">{{ establishment.name }}</a>
     <br>

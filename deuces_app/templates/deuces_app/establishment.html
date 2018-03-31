@@ -1,9 +1,9 @@
 {% extends "deuces_app/base.html" %}
 
 {% block content %}
-<h1><a href="{% url "index" %}">Home</a></h1>
 <h2>{{ establishment.name }}</h2>
 <p>{{ establishment.description }}</p>
+<h3>Add a review</h3>
 <form method="POST" action="{% url "add_restroom" establishment.name %}">
     {% csrf_token %}
     <table>
@@ -13,22 +13,26 @@
 </form>
     {% for restroom, reviews in restroom_reviews.items %}
         <hr>
-        <h3>{{ restroom.name }}</h3>
+<h3><a href="{% url "restroom" establishment.name restroom.name %}">{{ restroom.name }}</a></h3>
+        <p>{{ restroom.description }}</p>
+        <p>Gender: {{ restroom.gender }}</p>
+        <p>Level: {{ restroom.level }}</p>
         {% for feature in restroom.features.all %}
             {{ feature.name }}
         {% endfor %}
         {% for review in reviews %}
-            <h4>{{ review.deucer }}</h4>
-            <p>{{ review.rating }}</p>
+            <h4>{{ review.rating }}</h4>
+            <p>{{ review.deucer }}</p>
             <p>{{ review.review }}</p>
         {% endfor %}
-<form method="POST" action="{% url "add_review" establishment.name restroom.name %}">
-    {% csrf_token %}
-    <table>
-        {{ review_form }}
-    </table>
-    <input type="submit" value="Add review"/>
-</form>
+            <h4>Add a review</h4>
+            <form method="POST" action="{% url "add_review" establishment.name restroom.name %}">
+                {% csrf_token %}
+                <table>
+                    {{ review_form }}
+                </table>
+                <input type="submit" value="Add review"/>
+            </form>
     {% endfor %}
 
 {% endblock %}
