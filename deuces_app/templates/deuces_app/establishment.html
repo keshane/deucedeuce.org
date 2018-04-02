@@ -3,7 +3,11 @@
 {% block content %}
 <h2>{{ establishment.name }}</h2>
 <p>{{ establishment.description }}</p>
-<h3>Add a review</h3>
+<p>Average restroom rating: {{ establishment.rating_average }}</p>
+{% if user.is_authenticated %}
+<details>
+    <summary>Add a restroom</summary>
+
 <form method="POST" action="{% url "add_restroom" establishment.name %}">
     {% csrf_token %}
     <table>
@@ -11,28 +15,18 @@
     </table>
     <input type="submit" value="Add restroom"/>
 </form>
-    {% for restroom, reviews in restroom_reviews.items %}
+    </details>
+{% endif %}
+    {% for restroom in restrooms %}
         <hr>
 <h3><a href="{% url "restroom" establishment.name restroom.name %}">{{ restroom.name }}</a></h3>
+        <p>Average rating: {{ restroom.rating_average }}</p>
         <p>{{ restroom.description }}</p>
         <p>Gender: {{ restroom.gender }}</p>
         <p>Level: {{ restroom.level }}</p>
         {% for feature in restroom.features.all %}
             {{ feature.name }}
         {% endfor %}
-        {% for review in reviews %}
-            <h4>{{ review.rating }}</h4>
-            <p>{{ review.deucer }}</p>
-            <p>{{ review.review }}</p>
-        {% endfor %}
-            <h4>Add a review</h4>
-            <form method="POST" action="{% url "add_review" establishment.name restroom.name %}">
-                {% csrf_token %}
-                <table>
-                    {{ review_form }}
-                </table>
-                <input type="submit" value="Add review"/>
-            </form>
     {% endfor %}
 
 {% endblock %}

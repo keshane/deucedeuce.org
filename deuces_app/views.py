@@ -35,14 +35,26 @@ def index(request):
 def establishment(request, establishment_name):
     establishment = deuces_app.models.Establishment.objects.get(name=establishment_name)
     restrooms = deuces_app.models.Restroom.objects.filter(establishment__name=establishment_name)
-    restroom_reviews = {}
+    sum_of_restrooms_average_ratings = 0
+    restrooms_more_than_zero_ratings = 0
     for restroom in restrooms:
         reviews = deuces_app.models.Review.objects.filter(restroom=restroom)
-        restroom_reviews[restroom] = reviews
-    data = {"restroom_reviews": restroom_reviews,
-            "establishment": establishment,
+        rating_average = 0
+        if len(reviews) > 0:
+            rating_average = sum(review.rating.value for review in reviews) / len(reviews)
+            rating_average = round(rating_average, 1)
+            restrooms_more_than_zero_ratings += 1
+        restroom.rating_average = rating_average
+        sum_of_restrooms_average_ratings += rating_average
+    if len(restrooms) > 0:
+        establishment.rating_average = round(sum_of_restrooms_average_ratings / restrooms_more_than_zero_ratings, 1)
+    else:
+        establishment.rating_average = 0
+
+    data = {"establishment": establishment,
             "restroom_form": RestroomForm(),
-            "review_form": ReviewForm(),
+            "restrooms": restrooms,
+
     }
     return render(request, "deuces_app/establishment.html", data)
 
@@ -50,13 +62,16 @@ def establishment(request, establishment_name):
 def restroom(request, establishment_name, restroom_name):
     restroom = deuces_app.models.Restroom.objects.get(establishment__name=establishment_name, name=restroom_name)
     reviews = deuces_app.models.Review.objects.filter(restroom=restroom)
+    rating_average = sum(review.rating.value for review in reviews) / len(reviews)
+    rating_average = round(rating_average, 1)
     data = {
             "restroom": restroom,
             "reviews": reviews,
+            "review_form": ReviewForm(),
+            "rating_average": rating_average,
            }
 
     return render(request, "deuces_app/restroom.html", data)
-
 
 
 def add_restroom(request, establishment_name):
@@ -79,7 +94,7 @@ def add_review(request, establishment_name, restroom_name):
             review.restroom = deuces_app.models.Restroom.objects.get(name=restroom_name)
             review.deucer = deucer
             review.save()
-    return HttpResponseRedirect(reverse("establishment", args=[establishment_name]))
+    return HttpResponseRedirect(reverse("restroom", args=[establishment_name, restroom_name]))
 
 
 def join(request):

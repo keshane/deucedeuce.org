@@ -67,7 +67,7 @@ class Restroom(models.Model):
     gender = models.ForeignKey(Gender, models.DO_NOTHING, db_column='gender')
     level = models.IntegerField()
     establishment = models.ForeignKey(Establishment, models.DO_NOTHING, db_column='establishment')
-    features = models.ManyToManyField(Feature)
+    features = models.ManyToManyField(Feature, blank=True)
 
     def __str__(self):
         return self.name

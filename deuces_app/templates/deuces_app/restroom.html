@@ -7,6 +7,7 @@
 </a>
 </h2>
 <h2>Restroom: {{ restroom.name }}</h2>
+Average rating: {{ rating_average }}
 {% for review in reviews %}
     <hr>
     <h3>{{ review.deucer }}</h3>
@@ -14,5 +15,17 @@
     <p>{{ review.review }}</p>
 {% endfor %}
 
+{% if user.is_authenticated %}
+<hr>
+<h3>Add your review</h3>
+
+            <form method="POST" action="{% url "add_review" restroom.establishment.name restroom.name %}">
+                {% csrf_token %}
+                <table>
+                    {{ review_form }}
+                </table>
+                <input type="submit" value="Add review"/>
+            </form>
+{% endif %}
 
 {% endblock %}

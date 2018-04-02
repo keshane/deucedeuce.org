@@ -3,14 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Deuces</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/normalize.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "css/skeleton.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "css/deuces.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "css/raleway.css" %}"/>
 </head>
 <body>
+<div class="container">
 {% if user.is_authenticated %}
-<p>Hello, {{ user.username }}</p>
+<p>Hello, {{ user.username }} | <a href="{% url "sign_out" %}">Sign out</a></p>
 {% endif %}
 <h1><a href="{% url "index" %}">Deuces</a></h1>
 {% block content %}
 
 {% endblock %}
-
+</div>
 </body>
