@@ -11,8 +11,15 @@
 </head>
 <body>
 <div class="container">
-{% if user.is_authenticated %}
-<p>Hello, {{ user.username }} | <a href="{% url "sign_out" %}">Sign out</a></p>
+{% if user_info %}
+    <div class="row">
+        <div class="six columns">
+<p>Hello, {{ user_info.username }} | <a href="{% url "sign_out" %}">Sign out</a></p>
+        </div>
+        <div class="six columns">
+            <p class="u-pull-right">Points: {{ deucer_points }}</p>
+        </div>
+    </div>
 {% endif %}
 <h1><a href="{% url "index" %}">Deuces</a></h1>
 {% block content %}

@@ -7,6 +7,7 @@ from deuces_app.forms import RestroomForm
 from deuces_app.forms import ReviewForm
 from django.contrib.auth.hashers import make_password
 from django.urls import reverse
+from django.db import transaction
 
 
 # Create your views here.
@@ -14,7 +15,11 @@ def index(request):
     if request.method == "POST" and request.user.is_authenticated:
         form = EstablishmentForm(request.POST)
         if form.is_valid():
-            form.save()
+            deucer = deuces_app.models.Deucer.objects.get(user=request.user)
+            deucer.points += 10
+            with transaction.atomic():
+                deucer.save()
+                form.save()
             return HttpResponseRedirect("/")
     else:
         establishments = deuces_app.models.Establishment.objects.all()
@@ -29,25 +34,30 @@ def index(request):
             }
         if request.user.is_authenticated:
             data["form"] = EstablishmentForm()
+            data["user_info"] = request.user
+            data["deucer_points"] = deuces_app.models.Deucer.objects.get(user=request.user).points
     return render(request, 'deuces_app/index.html', data)
 
 
 def establishment(request, establishment_name):
     establishment = deuces_app.models.Establishment.objects.get(name=establishment_name)
-    restrooms = deuces_app.models.Restroom.objects.filter(establishment__name=establishment_name)
+    restrooms = establishment.restroom_set.all()
     sum_of_restrooms_average_ratings = 0
-    restrooms_more_than_zero_ratings = 0
+    restrooms_with_more_than_zero_ratings = 0
+
     for restroom in restrooms:
-        reviews = deuces_app.models.Review.objects.filter(restroom=restroom)
+        all_reviews = restroom.review_set.all()
         rating_average = 0
-        if len(reviews) > 0:
-            rating_average = sum(review.rating.value for review in reviews) / len(reviews)
+        # avoids divide by 0
+        if len(all_reviews) > 0:
+            rating_average = sum(review.rating.value for review in all_reviews) / len(all_reviews)
             rating_average = round(rating_average, 1)
-            restrooms_more_than_zero_ratings += 1
+            sum_of_restrooms_average_ratings += rating_average
+            restrooms_with_more_than_zero_ratings += 1
         restroom.rating_average = rating_average
-        sum_of_restrooms_average_ratings += rating_average
-    if len(restrooms) > 0:
-        establishment.rating_average = round(sum_of_restrooms_average_ratings / restrooms_more_than_zero_ratings, 1)
+
+    if restrooms_with_more_than_zero_ratings > 0:
+        establishment.rating_average = round(sum_of_restrooms_average_ratings / restrooms_with_more_than_zero_ratings, 1)
     else:
         establishment.rating_average = 0
 
@@ -56,21 +66,29 @@ def establishment(request, establishment_name):
             "restrooms": restrooms,
 
     }
+
+    if request.user.is_authenticated:
+        data["user_info"] = request.user
+        data["deucer_points"] = request.user.deucer_set.all()[0].points
     return render(request, "deuces_app/establishment.html", data)
 
 
 def restroom(request, establishment_name, restroom_name):
     restroom = deuces_app.models.Restroom.objects.get(establishment__name=establishment_name, name=restroom_name)
     reviews = deuces_app.models.Review.objects.filter(restroom=restroom)
-    rating_average = sum(review.rating.value for review in reviews) / len(reviews)
-    rating_average = round(rating_average, 1)
+    rating_average = 0
+    if len(reviews) > 0:
+        rating_average = sum(review.rating.value for review in reviews) / len(reviews)
+        rating_average = round(rating_average, 1)
     data = {
             "restroom": restroom,
             "reviews": reviews,
             "review_form": ReviewForm(),
             "rating_average": rating_average,
            }
-
+    if request.user.is_authenticated:
+        data["user_info"] = request.user
+        data["deucer_points"] = request.user.deucer_set.all()[0].points
     return render(request, "deuces_app/restroom.html", data)
 
 
@@ -80,8 +98,12 @@ def add_restroom(request, establishment_name):
         if form.is_valid():
             restroom = form.save(commit=False)
             restroom.establishment = deuces_app.models.Establishment.objects.get(name=establishment_name)
-            restroom.save()
-            form.save_m2m()
+            deucer = deuces_app.models.Deucer.objects.get(user=request.user)
+            deucer.points += 5
+            with transaction.atomic():
+                deucer.save()
+                restroom.save()
+                form.save_m2m()
     return HttpResponseRedirect(reverse("establishment", args=[establishment_name]))
 
 
@@ -93,7 +115,10 @@ def add_review(request, establishment_name, restroom_name):
             deucer = deuces_app.models.Deucer.objects.get(user=request.user)
             review.restroom = deuces_app.models.Restroom.objects.get(name=restroom_name)
             review.deucer = deucer
-            review.save()
+            deucer.points += 2
+            with transaction.atomic():
+                deucer.save()
+                review.save()
     return HttpResponseRedirect(reverse("restroom", args=[establishment_name, restroom_name]))
 
 
